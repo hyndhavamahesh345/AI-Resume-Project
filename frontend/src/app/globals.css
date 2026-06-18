@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #F1EDE6;
+  --color-secondary: #EBE5DB;
+  --color-text-primary: #0D0603;
+  --color-text-secondary: #3D2018;
+  --color-text-muted: #6B4A38;
+  --color-accent-dark: #3D2018;
+  --color-border: #CBAD8D;
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: var(--font-cormorant), serif;
+}
+
+body {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes expandLine {
+  from { width: 0; opacity: 0; }
+  to   { width: 80px; opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.animate-expand-line {
+  animation: expandLine 0.8s ease forwards;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-text-primary);
+  animation: pulseScale 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
