@@ -16,8 +16,8 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "AI ATS Resume | AI-powered application",
-  description: "AI-powered application system",
+  title: "AI ATS Resume | Beat ATS Filters with AI",
+  description: "Upload your resume and job description to get an AI-powered ATS score, skill gap analysis, LinkedIn optimization, and personalized career roadmap — in under 2 minutes.",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${cormorantGaramond.variable} h-full antialiased`}
-      style={{ scrollBehavior: 'smooth' }}
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full bg-primary text-primary font-sans">{children}</body>
     </html>

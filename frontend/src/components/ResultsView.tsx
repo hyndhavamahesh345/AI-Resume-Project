@@ -16,19 +16,6 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
   // Navigation active tab state
   const [activeTab, setActiveTab] = React.useState<'dashboard' | 'match' | 'star' | 'linkedin' | 'career'>('dashboard');
 
-  // State for tracking checked edits checklist items
-  const [checkedEdits, setCheckedEdits] = React.useState<Record<number, boolean>>({});
-
-  // State for tracking simulated keyword additions
-  const [addedSkills, setAddedSkills] = React.useState<Record<string, boolean>>({});
-
-  const toggleSkill = (skill: string) => {
-    setAddedSkills(prev => ({
-      ...prev,
-      [skill]: !prev[skill]
-    }));
-  };
-
   // Graceful fallback values for layout testing if data is still loading or undefined
   const candidate = data?.candidate || "Candidate";
   const initialAtsScore = data?.ats_score || 0;
@@ -40,6 +27,59 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
   const linkedinHeadline = data?.linkedin_headline || "";
   const linkedinAbout = data?.linkedin_about || "";
   const linkedinExperience = data?.linkedin_experience || [];
+
+  // State for tracking checked edits checklist items
+  const [checkedEdits, setCheckedEdits] = React.useState<Record<number, boolean>>({});
+
+  // State for tracking simulated keyword additions
+  const [addedSkills, setAddedSkills] = React.useState<Record<string, boolean>>({});
+
+  // Load from localStorage on mount/when candidate/score changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const editsKey = `ats_resume_edits_${candidate}_${initialAtsScore}`;
+        const skillsKey = `ats_resume_skills_${candidate}_${initialAtsScore}`;
+        const savedEdits = localStorage.getItem(editsKey);
+        const savedSkills = localStorage.getItem(skillsKey);
+        
+        setCheckedEdits(savedEdits ? JSON.parse(savedEdits) : {});
+        setAddedSkills(savedSkills ? JSON.parse(savedSkills) : {});
+      } catch (e) {
+        console.error("Failed to load state from localStorage", e);
+      }
+    }
+  }, [candidate, initialAtsScore]);
+
+  // Save to localStorage when state changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && candidate) {
+      try {
+        const editsKey = `ats_resume_edits_${candidate}_${initialAtsScore}`;
+        localStorage.setItem(editsKey, JSON.stringify(checkedEdits));
+      } catch (e) {
+        console.error("Failed to save checkedEdits to localStorage", e);
+      }
+    }
+  }, [checkedEdits, candidate, initialAtsScore]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && candidate) {
+      try {
+        const skillsKey = `ats_resume_skills_${candidate}_${initialAtsScore}`;
+        localStorage.setItem(skillsKey, JSON.stringify(addedSkills));
+      } catch (e) {
+        console.error("Failed to save addedSkills to localStorage", e);
+      }
+    }
+  }, [addedSkills, candidate, initialAtsScore]);
+
+  const toggleSkill = (skill: string) => {
+    setAddedSkills(prev => ({
+      ...prev,
+      [skill]: !prev[skill]
+    }));
+  };
 
   // Recalculate dynamic scores based on addedSkills
   const totalMissingCount = missingSkills.length;
