@@ -126,9 +126,6 @@ export default function Home() {
             AI ATS RESUME
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/recruiter" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
-              Recruiter Login
-            </Link>
             <Link href="/#how-it-works" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
               About →
             </Link>

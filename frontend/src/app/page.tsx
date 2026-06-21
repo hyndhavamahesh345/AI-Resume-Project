@@ -12,9 +12,6 @@ export default function LandingPage() {
           </span>
         </Link>
         <div className="flex gap-4 items-center">
-          <Link href="/recruiter" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
-            Recruiter Login
-          </Link>
           <Link 
             href="/app" 
             className="bg-accent-dark text-primary py-2 px-5 font-sans text-[10px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity"
