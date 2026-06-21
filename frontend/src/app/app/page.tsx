@@ -91,12 +91,16 @@ export default function Home() {
     const formData = new FormData();
     if (resumeFile instanceof File) {
       formData.append('resume', resumeFile);
-    } else {
+    } else if (resumeFile && typeof resumeFile === 'object' && 'name' in resumeFile) {
       const blob = new Blob(["Mock PDF content. React, Typescript."], { type: 'application/pdf' });
-      formData.append('resume', blob, (resumeFile as any)?.name || 'mock.pdf');
+      formData.append('resume', blob, (resumeFile as any).name || 'mock.pdf');
     }
-    formData.append('jobDescription', jobDescription);
-    formData.append('linkedinUrl', linkedinUrl);
+    if (jobDescription) {
+      formData.append('jobDescription', jobDescription);
+    }
+    if (linkedinUrl) {
+      formData.append('linkedinUrl', linkedinUrl);
+    }
 
     try {
       // Connect to the new Python FastAPI backend (Module 10 Orchestrator)
@@ -117,7 +121,7 @@ export default function Home() {
     }
   };
 
-  const isFormFilled = resumeFile && jobDescription.length > 50;
+  const isFormFilled = (resumeFile && jobDescription.length > 50) || (linkedinUrl && linkedinUrl.trim().startsWith('http'));
 
   return (
     <>
