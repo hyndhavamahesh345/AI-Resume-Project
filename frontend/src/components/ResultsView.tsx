@@ -63,12 +63,10 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
       </div>
 
       {/* Primary Scores Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 gap-6 mb-8">
         {[
           { label: "ATS Score", value: atsScore },
-          { label: "Job Match", value: jobMatchScore },
-          { label: "Semantic Match", value: semanticMatch },
-          { label: "Optimization Score", value: optimizationScore }
+          { label: "Job Match", value: jobMatchScore }
         ].map((stat, idx) => {
           const colors = getScoreColor(stat.value);
           return (
