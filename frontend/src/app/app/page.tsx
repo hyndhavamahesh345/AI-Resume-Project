@@ -121,7 +121,7 @@ export default function Home() {
     }
   };
 
-  const isFormFilled = (resumeFile && jobDescription.length > 50) || (linkedinUrl && linkedinUrl.trim().startsWith('http'));
+  const isFormFilled = resumeFile && jobDescription.length > 50;
 
   return (
     <>
@@ -135,6 +135,9 @@ export default function Home() {
           <div className="flex items-center gap-6">
             <Link href="/#how-it-works" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
               About →
+            </Link>
+            <Link href="/linkedin" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
+              LinkedIn Opt →
             </Link>
           </div>
         </nav>
@@ -151,10 +154,10 @@ export default function Home() {
               <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-8">
                 AI ATS Resume Pipeline
               </p>
-              <h1 className="font-serif text-[52px] font-light text-text-primary leading-[1.05] mb-0">
+              <h1 className="font-serif text-[52px] font-light text-text-primary leading-[1.05] mb-0 animate-fade-up">
                 Match the role.
               </h1>
-              <h1 className="font-serif text-[52px] font-light italic text-text-muted leading-[1.05] mb-6">
+              <h1 className="font-serif text-[52px] font-light italic text-text-muted leading-[1.05] mb-6 animate-fade-up" style={{ animationDelay: '150ms' }}>
                 Prove the capability.
               </h1>
               <p className="font-sans text-xs font-light text-text-muted leading-[1.8] max-w-[300px] mb-12">
@@ -358,19 +361,7 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* 3. LinkedIn URL (Optional) */}
-                  <div>
-                    <label htmlFor="linkedinUrl" className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                      3. LinkedIn URL <span className="text-text-muted font-light ml-1">(Optional)</span>
-                    </label>
-                    <input 
-                      id="linkedinUrl"
-                      type="url"
-                      value={linkedinUrl}
-                      onChange={(e) => setLinkedinUrl(e.target.value)}
-                      placeholder="e.g. https://linkedin.com/in/username"
-                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
-                    />
+
                   </div>
 
                   {/* Submit */}
@@ -388,7 +379,7 @@ export default function Home() {
                   </button>
 
                 </div>
-              </div>
+
             )}
 
           </div>

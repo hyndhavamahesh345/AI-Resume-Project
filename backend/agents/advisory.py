@@ -52,7 +52,10 @@ def generate_recruiter_view(job_intel: JobIntelligence, resume_intel: ResumeInte
     
     Provide a holistic recruiter score (0-100) and brief string evaluations for technical fit, leadership, and communication, plus a final recommendation.
     """
-    return recruiter_view_chain.invoke(prompt)
+    result = recruiter_view_chain.invoke(prompt)
+    if isinstance(result, dict):
+        result = RecruiterView(**result)
+    return result
 
 def optimize_resume(job_intel: JobIntelligence, resume_intel: ResumeIntelligence, skill_gap: SkillGap) -> ResumeOptimization:
     """Module 6: Resume Optimization Agent"""
@@ -63,7 +66,10 @@ def optimize_resume(job_intel: JobIntelligence, resume_intel: ResumeIntelligence
     Crucially, analyze the projects and experience for the STAR format (Situation, Task, Action, Result). 
     Provide 3-5 specific, actionable edits as bullet-points on exactly how the candidate can edit their resume to extend their score (e.g., rewriting a specific bullet to include measurable results or adding the missing skills naturally).
     """
-    return resume_optimizer_chain.invoke(prompt)
+    result = resume_optimizer_chain.invoke(prompt)
+    if isinstance(result, dict):
+        result = ResumeOptimization(**result)
+    return result
 
 def predict_interview(recruiter_view: RecruiterView, skill_gap: SkillGap) -> InterviewPrediction:
     """Module 8: Interview Prediction Engine"""
@@ -72,7 +78,10 @@ def predict_interview(recruiter_view: RecruiterView, skill_gap: SkillGap) -> Int
     predict the probability (e.g., "82%") of this candidate getting an interview. 
     Explain why in 2-3 short sentences.
     """
-    return interview_predictor_chain.invoke(prompt)
+    result = interview_predictor_chain.invoke(prompt)
+    if isinstance(result, dict):
+        result = InterviewPrediction(**result)
+    return result
 
 def generate_career_roadmap(job_intel: JobIntelligence, skill_gap: SkillGap) -> CareerRoadmap:
     """Module 9: Career Roadmap Generator"""
@@ -81,7 +90,10 @@ def generate_career_roadmap(job_intel: JobIntelligence, skill_gap: SkillGap) -> 
     They are currently missing: {skill_gap.missing}.
     Generate a concise, actionable career roadmap (list of 3-4 steps like learning a specific tool or building a specific project) to bridge this gap.
     """
-    return career_roadmap_chain.invoke(prompt)
+    result = career_roadmap_chain.invoke(prompt)
+    if isinstance(result, dict):
+        result = CareerRoadmap(**result)
+    return result
 
 def optimize_linkedin(linkedin_url: str, job_intel: JobIntelligence, resume_intel: ResumeIntelligence) -> LinkedInProfileOptimization:
     """Module 11: LinkedIn Optimization Agent"""
@@ -96,4 +108,7 @@ def optimize_linkedin(linkedin_url: str, job_intel: JobIntelligence, resume_inte
     2. A compelling 'About' summary statement (2-3 paragraphs in first-person narrative) detailing their tech stack and expertise.
     3. 3-4 experience description bullet-points tailored for LinkedIn.
     """
-    return linkedin_optimizer_chain.invoke(prompt)
+    result = linkedin_optimizer_chain.invoke(prompt)
+    if isinstance(result, dict):
+        result = LinkedInProfileOptimization(**result)
+    return result

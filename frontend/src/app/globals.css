@@ -39,7 +39,7 @@ body {
 }
 
 .animate-fade-up {
-  animation: fadeUp 0.8s ease forwards;
+  animation: fadeUp 0.8s ease both;
 }
 
 .animate-fade-in {

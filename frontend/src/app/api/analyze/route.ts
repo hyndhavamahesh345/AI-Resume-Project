@@ -18,9 +18,11 @@ export async function POST(req: NextRequest) {
     const applicantName = formData.get('applicantName') as string || 'Applicant';
     const company = formData.get('company') as string || 'Target Company';
     const recruiter = formData.get('recruiter') as string || 'Hiring Manager';
+    const linkedinUrl = formData.get('linkedinUrl') as string | null;
 
-    if (!resumeFile || !jobDescription) {
-      return NextResponse.json({ error: 'Missing resume or job description' }, { status: 400 });
+    // Allow either (resume + jobDescription) OR linkedinUrl (optional jobDescription)
+    if (!linkedinUrl && (!resumeFile || !jobDescription)) {
+      return NextResponse.json({ error: 'Provide either a resume + job description or a LinkedIn URL' }, { status: 400 });
     }
 
     if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'your_groq_api_key_here') {

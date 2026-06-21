@@ -41,6 +41,8 @@ def extract_resume_intelligence(resume_text: str) -> ResumeIntelligence:
     """
     # Invoke the structured chain
     result = resume_extractor.invoke(prompt)
+    if isinstance(result, dict):
+        result = ResumeIntelligence(**result)
     return result
 
 
@@ -59,4 +61,6 @@ def extract_job_intelligence(jd_text: str) -> JobIntelligence:
     """
     # Invoke the structured chain
     result = job_extractor.invoke(prompt)
+    if isinstance(result, dict):
+        result = JobIntelligence(**result)
     return result

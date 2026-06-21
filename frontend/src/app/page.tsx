@@ -27,10 +27,10 @@ export default function LandingPage() {
           <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-10">
             Application intelligence pipeline
           </p>
-          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light text-text-primary leading-none m-0">
+          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light text-text-primary leading-none m-0 animate-fade-up">
             Match the role.
           </h1>
-          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light italic text-text-muted leading-none mb-8">
+          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light italic text-text-muted leading-none mb-8 animate-fade-up" style={{ animationDelay: '150ms' }}>
             Prove the capability.
           </h1>
           <p className="font-sans text-sm font-light leading-[1.8] text-text-muted max-w-[440px] mb-10">
@@ -77,21 +77,21 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
-              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">01</div>
+              <div className="font-serif lining-nums text-[40px] font-light text-accent-dark leading-none mb-4">01</div>
               <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">ATS Rejection</h3>
               <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
                 Keyword mismatch filters qualified candidates before any human ever reads their resume.
               </p>
             </div>
             <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
-              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">02</div>
+              <div className="font-serif lining-nums text-[40px] font-light text-accent-dark leading-none mb-4">02</div>
               <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">Credential Bias</h3>
               <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
                 Recruiters pattern-match on brand names. Technical ability is invisible until the interview — too late.
               </p>
             </div>
             <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
-              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">03</div>
+              <div className="font-serif lining-nums text-[40px] font-light text-accent-dark leading-none mb-4">03</div>
               <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">Time Cost</h3>
               <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
                 20–40 hours of manual tailoring per application cycle. High effort, low leverage, wrong format.
@@ -122,7 +122,7 @@ export default function LandingPage() {
             ].map((step, idx) => (
               <div key={idx} className="grid grid-cols-[80px_1px_1fr] gap-x-6 pb-9 last:pb-0">
                 <div>
-                  <span className={`font-serif text-[32px] font-light leading-none ${step.isMuted ? 'text-text-muted' : 'text-text-primary'}`}>
+                  <span className={`font-serif lining-nums text-[32px] font-light leading-none ${step.isMuted ? 'text-text-muted' : 'text-text-primary'}`}>
                     {step.num}
                   </span>
                 </div>
