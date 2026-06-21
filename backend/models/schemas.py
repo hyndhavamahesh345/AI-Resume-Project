@@ -61,6 +61,8 @@ class FinalCandidateIntelligenceReport(BaseModel):
     missing_skills: List[str]
     strengths: List[str]
     recommendations: List[str]
+    optimization_score: int
+    resume_edits: List[str]
 
 # --- API Input Models ---
 

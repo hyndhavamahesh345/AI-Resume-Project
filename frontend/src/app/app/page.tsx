@@ -61,7 +61,11 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isProcessing, processingStep]);
 
-
+  useEffect(() => {
+    if (processingStep > 3 && resultsData && !resultsData.error) {
+      setIsComplete(true);
+    }
+  }, [processingStep, resultsData]);
 
   const handleDemoClick = (index: number) => {
     const demo = DEMOS[index];
@@ -135,7 +139,8 @@ export default function Home() {
         <main className="flex flex-1 overflow-hidden relative">
           
           {/* Left Pane */}
-          <div className="w-[400px] shrink-0 bg-secondary border-r border-border p-12 relative overflow-hidden flex flex-col">
+          {!isProcessing && !isComplete && (
+            <div className="w-[400px] shrink-0 bg-secondary border-r border-border p-12 relative overflow-hidden flex flex-col">
             <div className="absolute -bottom-5 -right-10 w-[200px] h-[300px] border border-border rounded-t-[100px] opacity-60 pointer-events-none" />
 
             <div className="relative z-10">
@@ -187,6 +192,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Right Pane (Form, Processing Screen, or Results) */}
           <div className="flex-1 overflow-y-auto p-12 relative flex justify-center">
@@ -259,14 +265,7 @@ export default function Home() {
                       >
                         Analysis Failed - Try Again
                       </button>
-                    ) : (
-                      <button 
-                        onClick={() => setIsComplete(true)}
-                        className="bg-accent-dark text-primary py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity"
-                      >
-                        View Package →
-                      </button>
-                    )
+                    ) : null
                   ) : (
                     <p className="font-sans text-[11px] font-medium text-text-primary">
                       Do not close this tab.

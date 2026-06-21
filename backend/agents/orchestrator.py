@@ -19,8 +19,7 @@ def process_candidate(jd_text: str, resume_text: str) -> FinalCandidateIntellige
     recruiter_view = generate_recruiter_view(job_intel, resume_intel)
     
     # Phase 3: Advisory Engines
-    # (Optional to run them all here, but we will run them to populate the full report)
-    # resume_optimization = optimize_resume(job_intel, resume_intel, skill_gap)
+    resume_optimization = optimize_resume(job_intel, resume_intel, skill_gap)
     interview_prediction = predict_interview(recruiter_view, skill_gap)
     career_roadmap = generate_career_roadmap(job_intel, skill_gap)
     
@@ -52,9 +51,10 @@ def process_candidate(jd_text: str, resume_text: str) -> FinalCandidateIntellige
             f"Leadership: {recruiter_view.leadership}",
             f"Communication: {recruiter_view.communication}"
         ],
-        recommendations=career_roadmap.recommendations
-    )
-    
+        recommendations=career_roadmap.recommendations,
+        optimization_score=resume_optimization.optimization_score,
+        resume_edits=resume_optimization.suggestions
+    )    
     # In a real system, we'd also save the final_score somewhere for ranking, 
     # but it's part of the holistic evaluation.
     

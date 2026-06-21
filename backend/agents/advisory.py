@@ -43,7 +43,9 @@ def optimize_resume(job_intel: JobIntelligence, resume_intel: ResumeIntelligence
     prompt = f"""
     You are an expert resume writer. The candidate is missing these skills: {skill_gap.missing}.
     Based on their current projects: {resume_intel.projects} and experience: {resume_intel.experience},
-    provide an optimization score (0-100) on how well written the resume is, and 3-5 specific bullet-point suggestions to improve it organically.
+    provide an optimization score (0-100) on how well written the resume is.
+    Crucially, analyze the projects and experience for the STAR format (Situation, Task, Action, Result). 
+    Provide 3-5 specific, actionable edits as bullet-points on exactly how the candidate can edit their resume to extend their score (e.g., rewriting a specific bullet to include measurable results or adding the missing skills naturally).
     """
     return resume_optimizer_chain.invoke(prompt)
 
