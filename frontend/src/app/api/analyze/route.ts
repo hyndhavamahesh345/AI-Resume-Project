@@ -34,14 +34,13 @@ export async function POST(req: NextRequest) {
     
     try {
       const pdfParseModule = require('pdf-parse');
-      const parsePDF = typeof pdfParseModule === 'function' ? pdfParseModule : (pdfParseModule.default || pdfParseModule);
+      const parsePDF = typeof pdfParseModule === 'function' ? pdfParseModule : (pdfParseModule.PDFParse || pdfParseModule.default || pdfParseModule);
       const pdfData = await parsePDF(buffer);
       resumeText = pdfData.text;
     } catch (e) {
       console.error("PDF parse error:", e);
-      // Fallback: If parsing fails (e.g. not a valid PDF or empty), we just pass an empty string 
-      // or error out. For demo purposes, we will continue with empty string.
-      resumeText = "Could not parse text from PDF.";
+      // Fallback: If parsing fails (e.g. not a valid PDF like our Demo blob), we just read the raw text.
+      resumeText = buffer.toString('utf-8');
     }
 
     const openai = new OpenAI({

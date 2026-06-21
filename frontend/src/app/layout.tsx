@@ -16,8 +16,8 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Project | AI-powered application",
-  description: "AI-powered application pipeline",
+  title: "AI ATS Resume | AI-powered application",
+  description: "AI-powered application system",
 };
 
 export default function RootLayout({

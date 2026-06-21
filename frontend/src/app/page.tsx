@@ -1,524 +1,222 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import ResultsView from '../components/ResultsView';
 
-const DEMOS = [
-  {
-    name: "Alex Johnson",
-    company: "TechFlow Inc.",
-    recruiter: "Sarah Miller",
-    jd: "We are looking for a Frontend React Developer with 1-2 years of experience. Must know React, Tailwind CSS, and Next.js. You will be building responsive user interfaces and integrating with REST APIs.",
-    fileName: "Alex_Johnson_Resume_Bootcamp.pdf"
-  },
-  {
-    name: "Jamie Smith",
-    company: "CloudCore",
-    recruiter: "David Chen",
-    jd: "Seeking a Junior Node.js Backend Engineer. Responsibilities include building scalable microservices, managing MongoDB databases, and writing Express.js routes.",
-    fileName: "Jamie_Smith_Backend_Resume.pdf"
-  },
-  {
-    name: "Taylor Reed",
-    company: "DataSync",
-    recruiter: "Emily Wong",
-    jd: "Data Engineer position available. We need a Python expert who can handle ETL pipelines, work with Pandas, and query large SQL databases efficiently.",
-    fileName: "Taylor_Reed_Data_Engineer.pdf"
-  }
-];
-
-const PIPELINE_STEPS = [
-  "Analyzing job description",
-  "Generating project",
-  "Deploying to Vercel",
-  "Rebuilding resume",
-  "Writing outreach copy"
-];
-
-export default function Home() {
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
-
-  // Form State
-  const [resumeFile, setResumeFile] = useState<File | { name: string } | null>(null);
-  const [jobDescription, setJobDescription] = useState("");
-  const [applicantName, setApplicantName] = useState("");
-  const [company, setCompany] = useState("");
-  const [recruiter, setRecruiter] = useState("");
-
-  // Processing State
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStep, setProcessingStep] = useState(0);
-  const [elapsedTimes, setElapsedTimes] = useState<number[]>([0, 0, 0, 0, 0]);
-  const [isComplete, setIsComplete] = useState(false);
-  const [resultsData, setResultsData] = useState<any>(null);
-
-  const resetForm = () => {
-    setIsComplete(false);
-    setIsProcessing(false);
-    setProcessingStep(0);
-    setElapsedTimes([0, 0, 0, 0, 0]);
-    setResultsData(null);
-    setResumeFile(null);
-    setJobDescription("");
-    setApplicantName("");
-    setCompany("");
-    setRecruiter("");
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Timer for active processing step
-  useEffect(() => {
-    if (!isProcessing || processingStep < 1 || processingStep > 5) return;
-    const interval = setInterval(() => {
-      setElapsedTimes(prev => {
-        const next = [...prev];
-        next[processingStep - 1] += 0.1;
-        return next;
-      });
-    }, 100);
-    return () => clearInterval(interval);
-  }, [isProcessing, processingStep]);
-
-
-
-  const handleDemoClick = (index: number) => {
-    const demo = DEMOS[index];
-    setResumeFile({ name: demo.fileName });
-    setJobDescription(demo.jd);
-    setApplicantName(demo.name);
-    setCompany(demo.company);
-    setRecruiter(demo.recruiter);
-    // Removed auto-start. User must click "Analyze my application" manually.
-  };
-
-  const startProcessing = async () => {
-    setIsProcessing(true);
-    setProcessingStep(1);
-    setElapsedTimes([0, 0, 0, 0, 0]);
-    setResultsData(null);
-
-    // Start timer sequence
-    let time = 0;
-    setTimeout(() => setProcessingStep(2), time += 3700); 
-    setTimeout(() => setProcessingStep(3), time += 15200); 
-    setTimeout(() => setProcessingStep(4), time += 8000);  
-    setTimeout(() => setProcessingStep(5), time += 6000);  
-    setTimeout(() => setProcessingStep(6), time += 4000);  
-
-    const formData = new FormData();
-    if (resumeFile instanceof File) {
-      formData.append('resume', resumeFile);
-    } else {
-      const blob = new Blob(["Mock PDF content. React, Typescript."], { type: 'application/pdf' });
-      formData.append('resume', blob, (resumeFile as any)?.name || 'mock.pdf');
-    }
-    formData.append('jobDescription', jobDescription);
-    formData.append('applicantName', applicantName);
-    formData.append('company', company);
-    formData.append('recruiter', recruiter);
-
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!res.ok) throw new Error("API failed");
-      const data = await res.json();
-      setResultsData(data);
-    } catch (e) {
-      console.error(e);
-      // Pass an error object instead of empty object to prevent ResultsView from crashing
-      setResultsData({ error: true });
-    }
-  };
-
-  const isFormFilled = resumeFile && jobDescription.length > 50 && applicantName;
-
+export default function LandingPage() {
   return (
-    <>
-      {/* Splash Screen Animation Overlay */}
-      {showSplash && (
-        <div 
-          className="fixed inset-0 bg-primary z-[9999] flex flex-col items-center justify-center pointer-events-none"
-          style={{ animation: 'fadeOut 0.5s ease 2.3s forwards' }}
-        >
-          <div className="flex items-baseline gap-0">
-            <span 
-              className="font-serif text-[96px] font-light text-text-primary leading-none opacity-0"
-              style={{ animation: 'fadeIn 0.8s ease 0.2s forwards' }}
-            >
-              RESUME
-            </span>
-            <span 
-              className="font-serif text-[96px] font-light text-accent-dark leading-none ml-[2px] opacity-0"
-              style={{ animation: 'fadeIn 0.8s ease 0.6s forwards' }}
-            >
-              PROJECT
-            </span>
-          </div>
-          <div 
-            className="mt-5 h-[1px] bg-border opacity-0 w-0"
-            style={{ animation: 'expandLine 0.8s ease 1.0s forwards' }}
-          ></div>
-          <p 
-            className="font-sans text-[11px] font-light text-text-muted tracking-[0.2em] uppercase mt-5 opacity-0"
-            style={{ animation: 'fadeIn 0.8s ease 1.4s forwards' }}
-          >
-            Match the role. Prove the capability.
-          </p>
-        </div>
-      )}
-
-      {/* Main App Container */}
-      <div 
-        className="min-h-screen bg-primary flex flex-col opacity-0"
-        style={{ animation: 'fadeIn 0.8s ease 2.4s forwards' }}
-      >
-        {/* Navigation */}
-        <nav className="border-b border-border h-14 px-8 flex items-center justify-between shrink-0">
-          <span className="font-serif text-lg tracking-[0.1em] text-text-primary">
-            RESUME PROJECT
+    <div className="bg-primary text-text-primary font-sans min-h-screen">
+      {/* Navigation */}
+      <nav className="bg-primary border-b border-border px-12 h-14 flex items-center justify-between sticky top-0 z-[100]">
+        <Link href="/">
+          <span className="font-serif text-lg font-normal tracking-[0.1em] text-text-primary uppercase cursor-pointer">
+            AI ATS RESUME
           </span>
-          <div className="flex items-center gap-6">
-            <Link href="/about#how-it-works" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
-              About →
+        </Link>
+        <div className="flex gap-4 items-center">
+          <Link href="/recruiter" className="font-sans text-[10px] text-text-muted tracking-widest uppercase hover:text-text-primary transition-colors">
+            Recruiter Login
+          </Link>
+          <Link 
+            href="/app" 
+            className="bg-accent-dark text-primary py-2 px-5 font-sans text-[10px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity"
+          >
+            Try it →
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="min-h-screen bg-primary grid grid-cols-1 lg:grid-cols-2 relative overflow-hidden">
+        <div className="flex flex-col justify-center py-24 px-12 lg:pl-16">
+          <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-10">
+            Application intelligence pipeline
+          </p>
+          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light text-text-primary leading-none m-0">
+            Match the role.
+          </h1>
+          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light italic text-text-muted leading-none mb-8">
+            Prove the capability.
+          </h1>
+          <p className="font-sans text-sm font-light leading-[1.8] text-text-muted max-w-[440px] mb-10">
+            Upload a resume and job description. Get an ATS-optimized resume and recruiter-ready outreach copy — in under 2 minutes.
+          </p>
+          <div className="flex gap-3 flex-wrap">
+            <Link 
+              href="/app" 
+              className="bg-accent-dark text-primary py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity text-center"
+            >
+              Try AI ATS Resume
             </Link>
+            <a 
+              href="#how-it-works" 
+              className="bg-transparent text-text-muted border border-border py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:border-text-muted hover:text-text-primary transition-colors text-center"
+            >
+              See how it works
+            </a>
           </div>
-        </nav>
+        </div>
+        
+        {/* Decorative Right Side */}
+        <div className="bg-secondary border-l border-border hidden lg:flex items-center justify-center relative overflow-hidden">
+          <div className="absolute -bottom-[60px] left-1/2 -translate-x-1/2 w-[320px] h-[480px] border border-border rounded-t-[160px] opacity-80 border-b-0 pointer-events-none"></div>
+          <div className="absolute -bottom-[60px] left-1/2 -translate-x-1/2 w-[200px] h-[340px] border border-border rounded-t-[100px] opacity-50 border-b-0 pointer-events-none"></div>
+          <span className="font-serif text-[200px] font-light text-border leading-none relative z-10 select-none">
+            R
+          </span>
+        </div>
+      </section>
 
-        {/* Main Content Split */}
-        <main className="flex flex-1 overflow-hidden relative">
-          
-          {/* Left Pane */}
-          <div className="w-[400px] shrink-0 bg-secondary border-r border-border p-12 relative overflow-hidden flex flex-col">
-            <div className="absolute -bottom-5 -right-10 w-[200px] h-[300px] border border-border rounded-t-[100px] opacity-60 pointer-events-none" />
+      {/* The Problem Section */}
+      <section id="the-problem" className="bg-secondary py-24 px-8 lg:px-16 border-t border-border">
+        <div className="max-w-[1100px] mx-auto">
+          <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-6">
+            The Problem
+          </p>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light text-text-primary m-0">
+            Three failure modes.
+          </h2>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light italic text-text-muted mb-16">
+            One broken outcome.
+          </h2>
 
-            <div className="relative z-10">
-              <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-8">
-                Resume Project Pipeline
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
+              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">01</div>
+              <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">ATS Rejection</h3>
+              <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
+                Keyword mismatch filters qualified candidates before any human ever reads their resume.
               </p>
-              <h1 className="font-serif text-[52px] font-light text-text-primary leading-[1.05] mb-0">
-                Match the role.
-              </h1>
-              <h1 className="font-serif text-[52px] font-light italic text-text-muted leading-[1.05] mb-6">
-                Prove the capability.
-              </h1>
-              <p className="font-sans text-xs font-light text-text-muted leading-[1.8] max-w-[300px] mb-12">
-                Upload a resume, paste a job description, and get a complete application package in under two minutes.
+            </div>
+            <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
+              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">02</div>
+              <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">Credential Bias</h3>
+              <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
+                Recruiters pattern-match on brand names. Technical ability is invisible until the interview — too late.
               </p>
-
-              <div className="flex flex-col gap-6">
-                {[
-                  { num: "01", title: "JD analysis", desc: "AI extracts required skills, exact keywords, and role context from the job description." },
-                  { num: "02", title: "Code generation + deploy", desc: "Codex builds a role-specific proof-of-work project and deploys it live to Vercel." },
-                  { num: "03", title: "Resume reconstruction", desc: "Resume experience is remapped to JD language — no fabrication, only realignment." },
-                  { num: "04", title: "Outreach copy", desc: "AI writes a cover letter and recruiter message that reference the live project URL." }
-                ].map((step, idx) => {
-                  // Highlight the current step if processing
-                  // The left pane has 4 steps, but our right pane pipeline has 5. We'll map them loosely.
-                  let currentLeftPaneStep = 0;
-                  if (processingStep === 1) currentLeftPaneStep = 1;
-                  else if (processingStep === 2 || processingStep === 3) currentLeftPaneStep = 2;
-                  else if (processingStep === 4) currentLeftPaneStep = 3;
-                  else if (processingStep === 5) currentLeftPaneStep = 4;
-                  else if (processingStep > 5) currentLeftPaneStep = 5;
-
-                  const isCurrentStep = isProcessing && currentLeftPaneStep === idx + 1;
-                  const isCompleted = isProcessing && currentLeftPaneStep > idx + 1;
-                  
-                  return (
-                    <div key={idx} className={`flex gap-5 transition-opacity duration-500 ${isProcessing && !isCurrentStep && !isCompleted ? 'opacity-30' : 'opacity-100'}`}>
-                      <span className={`font-serif text-[28px] shrink-0 leading-[1.1] transition-colors ${isCurrentStep ? 'text-text-primary font-medium' : 'font-light text-accent-dark'}`}>
-                        {isCompleted ? "✓" : step.num}
-                      </span>
-                      <div>
-                        <p className={`font-sans text-[13px] mb-1 transition-colors ${isCurrentStep ? 'text-text-primary font-bold' : 'font-medium text-text-secondary'}`}>
-                          {step.title}
-                        </p>
-                        <p className="font-sans text-[11px] font-light text-text-muted leading-[1.6]">
-                          {step.desc}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            </div>
+            <div className="bg-primary border-t-2 border-text-primary pt-6 px-6 pb-8">
+              <div className="font-serif text-[40px] font-light text-accent-dark leading-none mb-4">03</div>
+              <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">Time Cost</h3>
+              <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
+                20–40 hours of manual tailoring per application cycle. High effort, low leverage, wrong format.
+              </p>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Right Pane (Form, Processing Screen, or Results) */}
-          <div className="flex-1 overflow-y-auto p-12 relative flex justify-center">
-            
-            {isComplete ? (
-              <ResultsView onStartOver={resetForm} data={resultsData} />
-            ) : isProcessing ? (
-              <div className="w-full max-w-2xl mt-4 animate-fade-in">
-                <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-4">
-                  Pipeline Running
-                </p>
-                <h2 className="font-serif text-[48px] font-light text-text-primary mb-2 leading-none">
-                  Building your package
-                </h2>
-                <p className="font-sans text-[13px] font-light text-text-muted mb-12">
-                  Typically 60–90 seconds — all five stages run sequentially.
-                </p>
+      {/* How It Works Section */}
+      <section id="how-it-works" className="bg-primary py-24 px-8 lg:px-16 border-t border-border">
+        <div className="max-w-[800px] mx-auto">
+          <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-6">
+            How It Works
+          </p>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light text-text-primary m-0">
+            Two inputs.
+          </h2>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light italic text-text-muted mb-16">
+            Three AI stages.
+          </h2>
 
-                <div className="border border-border p-10 mb-8 flex flex-col gap-7">
-                  {PIPELINE_STEPS.map((stepName, idx) => {
-                    const stepNum = idx + 1;
-                    const isActive = processingStep === stepNum;
-                    const isDone = processingStep > stepNum;
-                    const isPending = processingStep < stepNum;
-                    
-                    return (
-                      <div key={idx} className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
-                          <span className={`font-serif text-[26px] leading-none ${isPending ? 'text-border font-light' : 'text-text-primary font-light'}`}>
-                            0{stepNum}
-                          </span>
-                          <span className={`font-sans text-[14px] ${isPending ? 'text-text-muted font-light' : isDone ? 'text-text-secondary font-light' : 'text-text-primary font-normal'}`}>
-                            {stepName}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center justify-end w-24">
-                          {isDone && (
-                            stepName === "Deploying to Vercel" ? (
-                              <span className="font-sans text-[12px] font-light text-text-primary flex items-center justify-end gap-1.5 w-full">
-                                {elapsedTimes[idx].toFixed(1)}s <span className="text-[10px] mt-[1px] text-accent-dark font-bold">!</span>
-                              </span>
-                            ) : (
-                              <span className="font-sans text-[12px] font-light text-text-muted flex items-center justify-end gap-1.5 w-full">
-                                {elapsedTimes[idx].toFixed(1)}s <span className="text-[10px] mt-[1px] text-text-secondary">✓</span>
-                              </span>
-                            )
-                          )}
-                          {isActive && (
-                            <span className="font-sans text-[12px] font-light text-text-primary flex items-center justify-end gap-3 w-full">
-                              {elapsedTimes[idx].toFixed(1)}s
-                              <div className="pulse-dot"></div>
-                            </span>
-                          )}
-                          {isPending && (
-                            <div className="w-2 h-2 bg-border rounded-full opacity-100"></div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+          <div className="flex flex-col">
+            {[
+              { num: "01", title: "Job Match Intelligence", desc: "AI understands the role requirements and evaluates your profile using semantic matching and recruiter-grade scoring.", isMuted: false },
+              { num: "02", title: "Candidate Intelligence Report", desc: "Receive ATS score, skill-gap analysis, recruiter insights, strengths, weaknesses, and interview probability.", isMuted: false },
+              { num: "03", title: "AI Career Copilot", desc: "Optimize your resume, generate tailored applications, and get personalized recommendations to land more interviews.", isMuted: true },
+            ].map((step, idx) => (
+              <div key={idx} className="grid grid-cols-[80px_1px_1fr] gap-x-6 pb-9 last:pb-0">
+                <div>
+                  <span className={`font-serif text-[32px] font-light leading-none ${step.isMuted ? 'text-text-muted' : 'text-text-primary'}`}>
+                    {step.num}
+                  </span>
                 </div>
-                
-                <div className="text-center mt-12">
-                  {processingStep > 5 && resultsData ? (
-                    resultsData.error ? (
-                      <button 
-                        onClick={resetForm}
-                        className="bg-red-900 text-white py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity"
-                      >
-                        Analysis Failed - Try Again
-                      </button>
-                    ) : (
-                      <button 
-                        onClick={() => setIsComplete(true)}
-                        className="bg-accent-dark text-primary py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity"
-                      >
-                        View Package →
-                      </button>
-                    )
-                  ) : (
-                    <p className="font-sans text-[11px] font-medium text-text-primary">
-                      Do not close this tab.
-                    </p>
-                  )}
+                <div className="bg-border w-[1px]"></div>
+                <div className="pt-1">
+                  <h3 className="font-sans text-sm font-medium text-text-primary m-0 mb-2">{step.title}</h3>
+                  <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
-            ) : (
-              <div className="w-full max-w-2xl animate-fade-in">
-                <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-3">
-                  Pipeline
-                </p>
-                <h2 className="font-serif text-4xl font-light text-text-primary mb-10">
-                  Start your application
-                </h2>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                <div className="flex flex-col gap-8">
-                  
-                  {/* Demos */}
-                  <div>
-                    <p className="font-sans text-[9px] font-medium tracking-[0.2em] uppercase text-text-muted mb-2.5">
-                      Try a demo
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {["Demo 1 · Bootcamp → React Frontend", "Demo 2 · Junior Dev → Node.js Backend", "Demo 3 · CS Grad → Python Data Engineer"].map((demo, i) => (
-                        <button 
-                          key={i} 
-                          onClick={() => handleDemoClick(i)}
-                          className="bg-secondary border border-border text-text-muted font-sans text-[10px] py-2 px-4 hover:bg-primary hover:text-accent-dark transition-colors tracking-[0.05em]"
-                        >
-                          {demo}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 1. Resume */}
-                  <div>
-                    <label className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                      1. Resume <span className="text-text-muted font-light ml-1">PDF or DOCX</span>
-                    </label>
-                    <label className="flex flex-col items-center justify-center border border-dashed border-accent-dark bg-secondary py-8 px-4 cursor-pointer hover:bg-opacity-80 transition-colors">
-                      {resumeFile ? (
-                        <span className="font-sans text-[13px] font-medium text-accent-dark">
-                          ✓ {resumeFile.name}
-                        </span>
-                      ) : (
-                        <>
-                          <span className="font-sans text-[13px] font-light text-text-muted">
-                            Drop PDF or DOCX here, or <span className="text-text-secondary font-normal">browse</span>
-                          </span>
-                          <span className="font-sans text-[11px] text-text-muted mt-1">Up to 10 MB</span>
-                        </>
-                      )}
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        accept=".pdf,.docx" 
-                        onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            setResumeFile(e.target.files[0]);
-                          }
-                        }}
-                      />
-                    </label>
-
-                    {/* Optional Contact Details Toggle */}
-                    <div className="mt-3">
-                      <button 
-                        onClick={() => setIsContactOpen(!isContactOpen)}
-                        className="flex items-center gap-2 font-sans text-xs font-medium text-text-secondary tracking-[0.02em]"
-                      >
-                        <span className="text-text-muted w-3">{isContactOpen ? '▾' : '▸'}</span>
-                        Contact details (optional)
-                      </button>
-                      {isContactOpen && (
-                        <div className="grid grid-cols-2 gap-3 pt-3 animate-fade-up">
-                          {[
-                            { id: "email", label: "Email", placeholder: "e.g. name@email.com" },
-                            { id: "phone", label: "Phone", placeholder: "+1 (555) 000-0000" },
-                            { id: "linkedin", label: "LinkedIn", placeholder: "linkedin.com/in/yourname" },
-                            { id: "github", label: "GitHub", placeholder: "github.com/yourname" },
-                            { id: "website", label: "Website", placeholder: "yourportfolio.com" },
-                            { id: "location", label: "Location", placeholder: "City, State" }
-                          ].map((field) => (
-                            <div key={field.id}>
-                              <label htmlFor={field.id} className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                                {field.label}
-                              </label>
-                              <input 
-                                id={field.id}
-                                type="text"
-                                placeholder={field.placeholder}
-                                className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 2. Job description */}
-                  <div>
-                    <div className="flex items-baseline justify-between mb-2">
-                      <label htmlFor="jd" className="font-sans text-xs font-medium text-text-secondary tracking-[0.02em]">
-                        2. Job description
-                      </label>
-                      <span className="font-sans text-[11px] text-text-muted">
-                        {Math.max(0, 50 - jobDescription.length)} more chars needed
-                      </span>
-                    </div>
-                    <textarea 
-                      id="jd"
-                      rows={8}
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                      placeholder="Paste the complete job description here..."
-                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark resize-y leading-[1.6] transition-colors"
-                    />
-                  </div>
-
-                  {/* 3. Your name */}
-                  <div>
-                    <label htmlFor="name" className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                      3. Your name
-                    </label>
-                    <input 
-                      id="name"
-                      type="text"
-                      value={applicantName}
-                      onChange={(e) => setApplicantName(e.target.value)}
-                      placeholder="Full name (used in cover letter and outreach)"
-                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
-                    />
-                  </div>
-
-                  {/* 4. Target company */}
-                  <div>
-                    <label htmlFor="company" className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                      4. Target company <span className="text-text-muted font-light ml-1">optional</span>
-                    </label>
-                    <input 
-                      id="company"
-                      type="text"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="e.g. Google, Stripe, Figma"
-                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
-                    />
-                  </div>
-
-                  {/* 5. Recruiter name */}
-                  <div>
-                    <label htmlFor="recruiter" className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
-                      5. Recruiter name <span className="text-text-muted font-light ml-1">optional</span>
-                    </label>
-                    <input 
-                      id="recruiter"
-                      type="text"
-                      value={recruiter}
-                      onChange={(e) => setRecruiter(e.target.value)}
-                      placeholder="e.g. Priya Shah"
-                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
-                    />
-                  </div>
-
-                  {/* Submit */}
-                  <button 
-                    type="button"
-                    onClick={startProcessing}
-                    disabled={!isFormFilled}
-                    className={`w-full py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase mt-2 transition-colors ${
-                      isFormFilled 
-                        ? 'bg-accent-dark text-primary hover:opacity-90 cursor-pointer' 
-                        : 'bg-border text-text-muted cursor-not-allowed'
-                    }`}
-                  >
-                    Analyze my application
-                  </button>
-
-                </div>
-              </div>
-            )}
-
+      {/* Comparison Section */}
+      <section className="bg-secondary py-24 px-8 lg:px-16 border-t border-border">
+        <div className="max-w-[900px] mx-auto">
+          <div className="text-center mb-16">
+            <div className="font-serif text-[clamp(64px,10vw,96px)] font-light text-text-primary leading-none">
+              25% → 88%
+            </div>
+            <p className="font-sans text-[13px] font-light text-text-muted mt-4">
+              +63 percentage points. ATS keyword alignment improvement.
+            </p>
           </div>
 
-        </main>
-      </div>
-    </>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div>
+              <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-6">
+                Before AI ATS Resume
+              </p>
+              {[
+                "Keyword mismatch causes ATS rejection before any human reads the resume",
+                "Generic resume language fails to match JD-specific terminology",
+                "No proof of capability beyond a list of claimed skills"
+              ].map((text, i) => (
+                <div key={i} className="flex gap-3 mb-4">
+                  <span className="text-border shrink-0 mt-[2px] font-sans">—</span>
+                  <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">{text}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-6">
+                After AI ATS Resume
+              </p>
+              {[
+                "Resume rebuilt in JD's exact language — passes ATS keyword matching",
+                "Skills list automatically generated from matching tech stacks",
+                "Recruiter message under 300 characters for immediate impact"
+              ].map((text, i) => (
+                <div key={i} className="flex gap-3 mb-4">
+                  <span className="text-text-secondary shrink-0 mt-[2px] font-sans">✓</span>
+                  <p className="font-sans text-[13px] font-normal leading-[1.7] text-text-primary m-0">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-primary py-28 px-8 lg:px-16 border-t border-border relative overflow-hidden">
+        <div className="absolute left-1/2 -top-10 -translate-x-1/2 w-[280px] h-[400px] border border-border rounded-t-[140px] border-b-0 pointer-events-none"></div>
+        <div className="relative z-10 max-w-[700px] mx-auto text-center md:text-left">
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light text-text-primary m-0">
+            The application is no longer a claim.
+          </h2>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] font-light italic text-text-muted m-0 mb-12">
+            It is a demonstration.
+          </h2>
+          <Link 
+            href="/app" 
+            className="bg-accent-dark text-primary text-[12px] py-4 px-10 font-sans font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity inline-block"
+          >
+            Try AI ATS Resume →
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-secondary border-t border-border py-8 px-8 lg:px-16 flex justify-between items-center flex-wrap gap-4">
+        <span className="font-serif text-lg font-normal tracking-[0.1em] text-text-primary uppercase">
+          AI ATS RESUME
+        </span>
+        <span className="font-sans text-[11px] font-light text-text-muted">
+          AI ATS Resume
+        </span>
+      </footer>
+    </div>
   );
 }

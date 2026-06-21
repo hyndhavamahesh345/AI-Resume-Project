@@ -1,4 +1,4 @@
-# AI Resume Project
+# AI ATS Resume
 
 An intelligent, AI-powered application pipeline that helps you seamlessly tailor your resume to any job description. Built with Next.js, Tailwind CSS, and the Groq LLM API.
 
