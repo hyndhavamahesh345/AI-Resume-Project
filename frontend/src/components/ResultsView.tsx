@@ -19,14 +19,39 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
   // State for tracking checked edits checklist items
   const [checkedEdits, setCheckedEdits] = React.useState<Record<number, boolean>>({});
 
+  // State for tracking simulated keyword additions
+  const [addedSkills, setAddedSkills] = React.useState<Record<string, boolean>>({});
+
+  const toggleSkill = (skill: string) => {
+    setAddedSkills(prev => ({
+      ...prev,
+      [skill]: !prev[skill]
+    }));
+  };
+
   // Graceful fallback values for layout testing if data is still loading or undefined
   const candidate = data?.candidate || "Candidate";
-  const atsScore = data?.ats_score || 0;
+  const initialAtsScore = data?.ats_score || 0;
   const jobMatchScore = data?.job_match_score || 0;
   const missingSkills = data?.missing_skills || [];
   const recommendations = data?.recommendations || [];
   const optimizationScore = data?.optimization_score || 0;
   const resumeEdits = data?.resume_edits || [];
+  const linkedinHeadline = data?.linkedin_headline || "";
+  const linkedinAbout = data?.linkedin_about || "";
+  const linkedinExperience = data?.linkedin_experience || [];
+
+  // Recalculate dynamic scores based on addedSkills
+  const totalMissingCount = missingSkills.length;
+  const addedCount = Object.values(addedSkills).filter(Boolean).length;
+
+  // Calculate increment: scale up to 95 max
+  const remainingScoreRange = 95 - initialAtsScore;
+  const incrementPerSkill = totalMissingCount > 0 ? Math.ceil(remainingScoreRange / totalMissingCount) : 0;
+  const currentAtsScore = Math.min(95, initialAtsScore + addedCount * incrementPerSkill);
+
+  // Recalculate dynamic job match score
+  const currentJobMatchScore = Math.min(100, jobMatchScore + (totalMissingCount > 0 ? Math.ceil((100 - jobMatchScore) * (addedCount / totalMissingCount)) : 0));
 
   const toggleEdit = (idx: number) => {
     setCheckedEdits(prev => ({
@@ -38,17 +63,17 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
   // SVG circular dial properties
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (circumference * atsScore) / 100;
+  const strokeDashoffset = circumference - (circumference * currentAtsScore) / 100;
 
   let dialColor = '#ef4444';
   let scoreStatus = 'Needs Work';
-  if (atsScore >= 90) {
+  if (currentAtsScore >= 90) {
     dialColor = '#16a34a';
     scoreStatus = 'Excellent';
-  } else if (atsScore >= 80) {
+  } else if (currentAtsScore >= 80) {
     dialColor = '#eab308';
     scoreStatus = 'Good';
-  } else if (atsScore > 40) {
+  } else if (currentAtsScore > 40) {
     dialColor = '#f97316';
     scoreStatus = 'Needs Polish';
   }
@@ -172,15 +197,15 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
                 </svg>
                 {/* Center score labels */}
                 <div className="absolute flex flex-col items-center justify-center">
-                  <span className="font-serif text-[52px] font-light leading-none text-text-primary">
-                    {atsScore}
+                  <span className="font-serif text-[52px] font-light leading-none transition-colors duration-500" style={{ color: dialColor }}>
+                    {currentAtsScore}
                   </span>
                   <span className="font-sans text-[10px] text-text-muted uppercase tracking-[0.1em] mt-1">/ 100</span>
                 </div>
               </div>
 
               <span className="font-sans text-[12px] font-bold text-text-secondary uppercase tracking-[0.1em] mb-1">
-                Status: <span style={{ color: dialColor }}>{scoreStatus}</span>
+                Status: <span style={{ color: dialColor }} className="transition-colors duration-500">{scoreStatus}</span>
               </span>
             </div>
 
@@ -189,8 +214,7 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
               <p className="font-sans text-[10px] font-bold tracking-[0.15em] text-text-muted uppercase mb-5">
                 Score Metrics
               </p>
-              {renderProgressBar("Job Match Score", jobMatchScore)}
-              {renderProgressBar("STAR Optimization Score", optimizationScore)}
+              {renderProgressBar("Job Match Score", currentJobMatchScore)}
             </div>
 
           </div>
@@ -202,7 +226,7 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
             {(activeTab === 'dashboard' || activeTab === 'match') && (
               <div className="border border-border p-8 bg-secondary/10">
                 <h3 className="font-serif text-[24px] font-light text-text-primary mb-1">Keyword & Skill Gap</h3>
-                <p className="font-sans text-[12px] text-text-muted mb-6">Keywords and technical skills you need to add to pass ATS screening:</p>
+                <p className="font-sans text-[12px] text-text-muted mb-6">Keywords and technical skills you need to add to pass ATS screening (click to simulate adding):</p>
                 
                 {missingSkills.length === 0 ? (
                   <div className="bg-accent-dark text-primary inline-block py-2 px-4 font-sans text-[11px] font-medium">
@@ -210,13 +234,59 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2.5">
-                    {missingSkills.map((skill: string) => (
-                      <span key={skill} className="bg-red-900/40 border border-red-500/20 text-red-100 py-1.5 px-3.5 font-sans text-[11px] font-semibold">
-                        {skill}
-                      </span>
-                    ))}
+                    {missingSkills.map((skill: string) => {
+                      const isAdded = !!addedSkills[skill];
+                      return (
+                        <span 
+                          key={skill} 
+                          onClick={() => toggleSkill(skill)}
+                          className={`py-1.5 px-3.5 font-sans text-[11px] font-semibold cursor-pointer select-none transition-all border duration-300 ${
+                            isAdded 
+                              ? 'bg-green-900/40 border-green-500/30 text-green-100' 
+                              : 'bg-red-900/40 border-red-500/20 text-red-100 hover:border-red-500/50'
+                          }`}
+                        >
+                          {isAdded ? "✓" : "+"} {skill}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
+
+                {/* Score Optimization Suggestions Panel */}
+                {missingSkills.length > 0 && (
+                  <div className="mt-8 pt-6 border-t border-border/30">
+                    <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-4">
+                      Score Optimization Suggestions
+                    </h4>
+                    <div className="flex flex-col gap-3">
+                      {missingSkills.map((skill: string) => {
+                        const isAdded = !!addedSkills[skill];
+                        if (isAdded) return null;
+                        
+                        const scoreAfterAdding = Math.min(95, currentAtsScore + incrementPerSkill);
+                        return (
+                          <div 
+                            key={skill}
+                            onClick={() => toggleSkill(skill)}
+                            className="flex items-center gap-3.5 p-3.5 bg-primary border border-border hover:border-accent-dark cursor-pointer transition-all duration-300 group"
+                          >
+                            <span className="text-accent-dark group-hover:scale-110 transition-transform text-sm">💡</span>
+                            <span className="font-sans text-[12px] text-text-secondary leading-relaxed">
+                              Add <strong className="text-text-primary font-medium">{skill}</strong> to your resume to increase your ATS score to <strong className="text-accent-dark font-semibold">{scoreAfterAdding}%</strong>.
+                            </span>
+                          </div>
+                        );
+                      })}
+                      {addedCount === totalMissingCount && (
+                        <div className="bg-accent-dark/10 border border-accent-dark/30 text-text-primary py-3.5 px-5 font-sans text-[12px] font-medium leading-relaxed">
+                          🎉 All keywords simulated! Your ATS score has been successfully optimized to <strong className="text-accent-dark">{currentAtsScore}%</strong>.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
 
@@ -277,36 +347,44 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
             {activeTab === 'linkedin' && (
               <div className="border border-border p-8 bg-secondary/10">
                 <div className="flex justify-between items-baseline mb-6">
-                  <h3 className="font-serif text-[24px] font-light text-text-primary">LinkedIn Optimization</h3>
+                  <h3 className="font-serif text-[24px] font-light text-text-primary">LinkedIn Profile Optimization</h3>
                   <span className="font-sans text-[10px] font-semibold text-text-muted uppercase tracking-[0.1em]">
-                    Profile Optimizer
+                    AI Profile Optimizer
                   </span>
                 </div>
                 <p className="font-sans text-[12px] text-text-muted mb-6 leading-relaxed">
-                  Increase your profile visibility to recruiters. Tailor your LinkedIn profile using these recommendations based on your target role:
+                  The AI has generated target optimizations to maximize your profile's search ranking and alignment for recruiters:
                 </p>
 
                 <div className="flex flex-col gap-4">
-                  <div className="border border-border p-4 bg-primary">
-                    <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">1. Headline Strategy</h4>
-                    <p className="font-sans text-[13px] leading-[1.6] text-text-secondary">
-                      Update your headline to include target keywords: <span className="font-semibold text-accent-dark">React Developer | Frontend Engineer | Next.js | TypeScript</span>. Avoid vague titles like "Aspiring Developer".
-                    </p>
-                  </div>
+                  {linkedinHeadline && (
+                    <div className="border border-border p-4 bg-primary">
+                      <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">1. Headline Strategy</h4>
+                      <p className="font-sans text-[13px] leading-[1.6] text-text-secondary">
+                        {linkedinHeadline}
+                      </p>
+                    </div>
+                  )}
 
-                  <div className="border border-border p-4 bg-primary">
-                    <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">2. About / Summary Section</h4>
-                    <p className="font-sans text-[13px] leading-[1.6] text-text-secondary">
-                      Draft a professional summary focusing on your tech stack. Include a keywords section listing: <span className="font-semibold text-accent-dark">{missingSkills.slice(0, 5).join(', ') || 'Frontend Development, REST APIs, UI Design'}</span>.
-                    </p>
-                  </div>
+                  {linkedinAbout && (
+                    <div className="border border-border p-4 bg-primary">
+                      <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">2. About / Summary Section</h4>
+                      <div className="font-sans text-[13px] leading-[1.6] text-text-secondary whitespace-pre-line">
+                        {linkedinAbout}
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="border border-border p-4 bg-primary">
-                    <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">3. Skills & Endorsements</h4>
-                    <p className="font-sans text-[13px] leading-[1.6] text-text-secondary">
-                      Add at least 3 of your core strengths and seek endorsements from peers or colleagues to boost your search rank.
-                    </p>
-                  </div>
+                  {linkedinExperience && linkedinExperience.length > 0 && (
+                    <div className="border border-border p-4 bg-primary">
+                      <h4 className="font-sans text-xs font-semibold text-text-primary uppercase tracking-wider mb-2">3. Experience Descriptions</h4>
+                      <ul className="list-disc pl-5 font-sans text-[13px] leading-[1.6] text-text-secondary flex flex-col gap-2">
+                        {linkedinExperience.map((bullet: string, i: number) => (
+                          <li key={i}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

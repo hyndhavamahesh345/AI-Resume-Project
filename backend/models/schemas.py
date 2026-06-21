@@ -49,6 +49,11 @@ class InterviewPrediction(BaseModel):
 class CareerRoadmap(BaseModel):
     recommendations: List[str]
 
+class LinkedInProfileOptimization(BaseModel):
+    headline: str
+    about: str
+    experience: List[str]
+
 # --- Final Composite Output ---
 
 class FinalCandidateIntelligenceReport(BaseModel):
@@ -63,6 +68,9 @@ class FinalCandidateIntelligenceReport(BaseModel):
     recommendations: List[str]
     optimization_score: int
     resume_edits: List[str]
+    linkedin_headline: Optional[str] = None
+    linkedin_about: Optional[str] = None
+    linkedin_experience: Optional[List[str]] = None
 
 # --- API Input Models ---
 

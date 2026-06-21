@@ -1,9 +1,15 @@
 from models.schemas import FinalCandidateIntelligenceReport
 from agents.extractors import extract_resume_intelligence, extract_job_intelligence
 from agents.matching import compute_semantic_match, analyze_skill_gap, compute_ats_score
-from agents.advisory import generate_recruiter_view, optimize_resume, predict_interview, generate_career_roadmap
+from agents.advisory import (
+    generate_recruiter_view, 
+    optimize_resume, 
+    predict_interview, 
+    generate_career_roadmap,
+    optimize_linkedin
+)
 
-def process_candidate(jd_text: str, resume_text: str) -> FinalCandidateIntelligenceReport:
+def process_candidate(jd_text: str, resume_text: str, linkedin_url: str = "") -> FinalCandidateIntelligenceReport:
     """
     Module 10: Candidate Ranking Engine (The Orchestrator)
     Runs all 9 modules to generate the final intelligence report.
@@ -22,6 +28,10 @@ def process_candidate(jd_text: str, resume_text: str) -> FinalCandidateIntellige
     resume_optimization = optimize_resume(job_intel, resume_intel, skill_gap)
     interview_prediction = predict_interview(recruiter_view, skill_gap)
     career_roadmap = generate_career_roadmap(job_intel, skill_gap)
+    
+    # Phase 4: LinkedIn Profile Optimization
+    effective_url = linkedin_url if linkedin_url and linkedin_url.strip() else "https://linkedin.com/in/candidate"
+    linkedin_optimization = optimize_linkedin(effective_url, job_intel, resume_intel)
     
     # Module 10: Final Hybrid Ranking Calculation
     # Formula: 0.25 * ATS + 0.35 * Semantic + 0.20 * Recruiter + 0.20 * Skill Match (Proxy for Experience/Project match)
@@ -53,7 +63,10 @@ def process_candidate(jd_text: str, resume_text: str) -> FinalCandidateIntellige
         ],
         recommendations=career_roadmap.recommendations,
         optimization_score=resume_optimization.optimization_score,
-        resume_edits=resume_optimization.suggestions
+        resume_edits=resume_optimization.suggestions,
+        linkedin_headline=linkedin_optimization.headline,
+        linkedin_about=linkedin_optimization.about,
+        linkedin_experience=linkedin_optimization.experience
     )    
     # In a real system, we'd also save the final_score somewhere for ranking, 
     # but it's part of the holistic evaluation.

@@ -6,17 +6,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize the Groq LLM (we assume GROQ_API_KEY is in the environment)
-# Using llama-3.3-70b-versatile for stable structured extraction
-llm = ChatGroq(
+# Initialize primary and fallback models
+llm_primary = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0,
     max_tokens=2000
 )
+llm_fallback = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0,
+    max_tokens=2000
+)
 
-# Create structured output chains
-resume_extractor = llm.with_structured_output(ResumeIntelligence)
-job_extractor = llm.with_structured_output(JobIntelligence)
+# Create structured output chains with fallback support
+resume_extractor = llm_primary.with_structured_output(ResumeIntelligence).with_fallbacks([
+    llm_fallback.with_structured_output(ResumeIntelligence)
+])
+job_extractor = llm_primary.with_structured_output(JobIntelligence).with_fallbacks([
+    llm_fallback.with_structured_output(JobIntelligence)
+])
 
 def extract_resume_intelligence(resume_text: str) -> ResumeIntelligence:
     """

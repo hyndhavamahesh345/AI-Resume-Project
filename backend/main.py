@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 import fitz  # PyMuPDF
 from models.schemas import FinalCandidateIntelligenceReport
 from agents.orchestrator import process_candidate
@@ -22,7 +23,8 @@ def read_root():
 @app.post("/api/v1/analyze", response_model=FinalCandidateIntelligenceReport)
 async def analyze_candidate(
     resume: UploadFile = File(...),
-    jobDescription: str = Form(...)
+    jobDescription: str = Form(...),
+    linkedinUrl: Optional[str] = Form(None)
 ):
     """
     This endpoint takes a Job Description and a Resume (as PDF)
@@ -47,7 +49,7 @@ async def analyze_candidate(
             raise HTTPException(status_code=400, detail="Could not extract text from the resume.")
 
         # Run the 10-module orchestrator
-        report = process_candidate(jobDescription, resume_text)
+        report = process_candidate(jobDescription, resume_text, linkedinUrl or "")
         return report
         
     except Exception as e:

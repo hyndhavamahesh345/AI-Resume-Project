@@ -30,6 +30,7 @@ export default function Home() {
   // Form State
   const [resumeFile, setResumeFile] = useState<File | { name: string } | null>(null);
   const [jobDescription, setJobDescription] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
 
   // Processing State
   const [isProcessing, setIsProcessing] = useState(false);
@@ -46,6 +47,7 @@ export default function Home() {
     setResultsData(null);
     setResumeFile(null);
     setJobDescription("");
+    setLinkedinUrl("");
   };
 
   // Timer for active processing step
@@ -94,6 +96,7 @@ export default function Home() {
       formData.append('resume', blob, (resumeFile as any)?.name || 'mock.pdf');
     }
     formData.append('jobDescription', jobDescription);
+    formData.append('linkedinUrl', linkedinUrl);
 
     try {
       // Connect to the new Python FastAPI backend (Module 10 Orchestrator)
@@ -348,6 +351,21 @@ export default function Home() {
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Paste the complete job description here..."
                       className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark resize-y leading-[1.6] transition-colors"
+                    />
+                  </div>
+
+                  {/* 3. LinkedIn URL (Optional) */}
+                  <div>
+                    <label htmlFor="linkedinUrl" className="font-sans text-xs font-medium text-text-secondary block mb-2 tracking-[0.02em]">
+                      3. LinkedIn URL <span className="text-text-muted font-light ml-1">(Optional)</span>
+                    </label>
+                    <input 
+                      id="linkedinUrl"
+                      type="url"
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      placeholder="e.g. https://linkedin.com/in/username"
+                      className="w-full bg-secondary border border-border text-text-primary p-3 font-sans text-sm outline-none focus:border-accent-dark transition-colors"
                     />
                   </div>
 

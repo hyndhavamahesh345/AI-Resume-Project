@@ -6,22 +6,38 @@ from models.schemas import (
     RecruiterView, 
     ResumeOptimization, 
     InterviewPrediction, 
-    CareerRoadmap
+    CareerRoadmap,
+    LinkedInProfileOptimization
 )
 
-# Initialize the Groq LLM
-# Using llama-3.3-70b-versatile for stable structured advisory output
-llm = ChatGroq(
+# Initialize primary and fallback models
+llm_primary = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0.2, # Slight creativity for advice
     max_tokens=2000
 )
+llm_fallback = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0.2,
+    max_tokens=2000
+)
 
-# Extractors with structured outputs
-recruiter_view_chain = llm.with_structured_output(RecruiterView)
-resume_optimizer_chain = llm.with_structured_output(ResumeOptimization)
-interview_predictor_chain = llm.with_structured_output(InterviewPrediction)
-career_roadmap_chain = llm.with_structured_output(CareerRoadmap)
+# Extractors with structured outputs and fallback support
+recruiter_view_chain = llm_primary.with_structured_output(RecruiterView).with_fallbacks([
+    llm_fallback.with_structured_output(RecruiterView)
+])
+resume_optimizer_chain = llm_primary.with_structured_output(ResumeOptimization).with_fallbacks([
+    llm_fallback.with_structured_output(ResumeOptimization)
+])
+interview_predictor_chain = llm_primary.with_structured_output(InterviewPrediction).with_fallbacks([
+    llm_fallback.with_structured_output(InterviewPrediction)
+])
+career_roadmap_chain = llm_primary.with_structured_output(CareerRoadmap).with_fallbacks([
+    llm_fallback.with_structured_output(CareerRoadmap)
+])
+linkedin_optimizer_chain = llm_primary.with_structured_output(LinkedInProfileOptimization).with_fallbacks([
+    llm_fallback.with_structured_output(LinkedInProfileOptimization)
+])
 
 def generate_recruiter_view(job_intel: JobIntelligence, resume_intel: ResumeIntelligence) -> RecruiterView:
     """Module 7: Recruiter View Engine"""
@@ -66,3 +82,18 @@ def generate_career_roadmap(job_intel: JobIntelligence, skill_gap: SkillGap) -> 
     Generate a concise, actionable career roadmap (list of 3-4 steps like learning a specific tool or building a specific project) to bridge this gap.
     """
     return career_roadmap_chain.invoke(prompt)
+
+def optimize_linkedin(linkedin_url: str, job_intel: JobIntelligence, resume_intel: ResumeIntelligence) -> LinkedInProfileOptimization:
+    """Module 11: LinkedIn Optimization Agent"""
+    prompt = f"""
+    You are an expert personal branding coach. The candidate wants to optimize their LinkedIn profile: {linkedin_url}.
+    They are targeting a role that requires: {job_intel.required_skills}.
+    Candidate Skills: {resume_intel.skills}.
+    Candidate Experience: {resume_intel.experience}.
+    
+    Provide:
+    1. A search-optimized headline (e.g. Job Title | Key Skills | Value Statement).
+    2. A compelling 'About' summary statement (2-3 paragraphs in first-person narrative) detailing their tech stack and expertise.
+    3. 3-4 experience description bullet-points tailored for LinkedIn.
+    """
+    return linkedin_optimizer_chain.invoke(prompt)
