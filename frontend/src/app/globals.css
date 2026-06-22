@@ -10,16 +10,16 @@
   --color-border: #CBAD8D;
   --font-sans: var(--font-inter), sans-serif;
   --font-serif: var(--font-cormorant), serif;
+
+  /* Register keyframe animations as Tailwind v4 theme tokens */
+  --animate-fade-up: fadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fadeIn 0.6s ease both;
+  --animate-expand-line: expandLine 0.8s ease both;
 }
 
-body {
-  background: var(--color-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-}
-
+/* Keyframe definitions */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -38,16 +38,28 @@ body {
   to   { opacity: 0; }
 }
 
+@keyframes pulseScale {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
+body {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Fallback explicit rules (in case Tailwind overrides) */
 .animate-fade-up {
-  animation: fadeUp 0.8s ease both;
+  animation: var(--animate-fade-up) !important;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s ease forwards;
+  animation: var(--animate-fade-in) !important;
 }
 
 .animate-expand-line {
-  animation: expandLine 0.8s ease forwards;
+  animation: var(--animate-expand-line) !important;
 }
 
 .pulse-dot {
@@ -56,11 +68,6 @@ body {
   border-radius: 50%;
   background-color: var(--color-text-primary);
   animation: pulseScale 1.2s ease-in-out infinite;
-}
-
-@keyframes pulseScale {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.4); }
 }
 
 /* Custom scrollbar */

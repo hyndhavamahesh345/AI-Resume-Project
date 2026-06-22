@@ -6,10 +6,10 @@ interface ResultsViewProps {
 }
 
 const getScoreColor = (score: number) => {
-  if (score >= 90) return { text: 'text-green-600', bg: 'bg-green-600' };
-  if (score >= 80) return { text: 'text-yellow-500', bg: 'bg-yellow-500' };
-  if (score > 40) return { text: 'text-orange-500', bg: 'bg-orange-500' };
-  return { text: 'text-red-500', bg: 'bg-red-500' };
+  if (score >= 90) return { text: 'text-[#2D6A4F]', bg: 'bg-[#2D6A4F]' };   // warm deep green
+  if (score >= 80) return { text: 'text-[#B5850B]', bg: 'bg-[#B5850B]' };   // warm amber
+  if (score > 40)  return { text: 'text-[#C05621]', bg: 'bg-[#C05621]' };   // warm terracotta
+  return { text: 'text-[#9B2335]', bg: 'bg-[#9B2335]' };                    // warm crimson
 };
 
 export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
@@ -105,24 +105,24 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (circumference * currentAtsScore) / 100;
 
-  let dialColor = '#ef4444';
+  let dialColor = '#9B2335';   // warm crimson — Needs Work
   let scoreStatus = 'Needs Work';
   if (currentAtsScore >= 90) {
-    dialColor = '#16a34a';
+    dialColor = '#2D6A4F';     // warm deep green — Excellent
     scoreStatus = 'Excellent';
   } else if (currentAtsScore >= 80) {
-    dialColor = '#eab308';
+    dialColor = '#B5850B';     // warm amber — Good
     scoreStatus = 'Good';
   } else if (currentAtsScore > 40) {
-    dialColor = '#f97316';
+    dialColor = '#C05621';     // warm terracotta — Needs Polish
     scoreStatus = 'Needs Polish';
   }
 
   const renderProgressBar = (label: string, value: number) => {
-    let barColor = 'bg-red-500';
-    if (value >= 90) barColor = 'bg-green-600';
-    else if (value >= 80) barColor = 'bg-yellow-500';
-    else if (value > 40) barColor = 'bg-orange-500';
+    let barColor = 'bg-[#9B2335]';
+    if (value >= 90) barColor = 'bg-[#2D6A4F]';
+    else if (value >= 80) barColor = 'bg-[#B5850B]';
+    else if (value > 40) barColor = 'bg-[#C05621]';
 
     return (
       <div className="mb-5">
@@ -193,7 +193,7 @@ export default function ResultsView({ onStartOver, data }: ResultsViewProps) {
           <p className="font-sans text-[10px] font-medium tracking-[0.2em] text-text-muted uppercase mb-2">
             Intelligence Report Generated
           </p>
-          <h2 className="font-serif text-[42px] font-light text-text-primary mb-1 leading-none">
+          <h2 className="font-serif text-[42px] font-light text-text-primary mb-1 leading-none animate-fade-up">
             {candidate}'s Career Dashboard
           </h2>
           <p className="font-sans text-[13px] font-light text-text-muted">

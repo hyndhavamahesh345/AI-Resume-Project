@@ -1,9 +1,28 @@
-import React from 'react';
+"use client";
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
+import IntroOverlay from '../components/IntroOverlay';
 
 export default function LandingPage() {
+  const [introComplete, setIntroComplete] = useState(false);
+
+  const handleIntroComplete = useCallback(() => {
+    setIntroComplete(true);
+  }, []);
+
+  // Hero elements animate in only after intro finishes
+  const fadeUp = (delay: string) =>
+    introComplete
+      ? { className: 'animate-fade-up', style: { animationDelay: delay } }
+      : { className: 'opacity-0', style: {} };
+
   return (
-    <div className="bg-primary text-text-primary font-sans min-h-screen">
+    <>
+      {!introComplete && <IntroOverlay onComplete={handleIntroComplete} />}
+      <div
+        className="bg-primary text-text-primary font-sans min-h-screen"
+        style={{ opacity: introComplete ? 1 : 0, transition: 'opacity 400ms ease' }}
+      >
       {/* Navigation */}
       <nav className="bg-primary border-b border-border px-12 h-14 flex items-center justify-between sticky top-0 z-[100]">
         <Link href="/">
@@ -24,19 +43,34 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="min-h-screen bg-primary grid grid-cols-1 lg:grid-cols-2 relative overflow-hidden">
         <div className="flex flex-col justify-center py-24 px-12 lg:pl-16">
-          <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-10">
+          <p
+            className={`font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-10 ${fadeUp('0ms').className}`}
+            style={fadeUp('0ms').style}
+          >
             Application intelligence pipeline
           </p>
-          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light text-text-primary leading-none m-0 animate-fade-up">
+          <h1
+            className={`font-serif text-[clamp(48px,5vw,80px)] font-light text-text-primary leading-none m-0 ${fadeUp('120ms').className}`}
+            style={fadeUp('120ms').style}
+          >
             Match the role.
           </h1>
-          <h1 className="font-serif text-[clamp(48px,5vw,80px)] font-light italic text-text-muted leading-none mb-8 animate-fade-up" style={{ animationDelay: '150ms' }}>
+          <h1
+            className={`font-serif text-[clamp(48px,5vw,80px)] font-light italic text-text-muted leading-none mb-8 ${fadeUp('260ms').className}`}
+            style={fadeUp('260ms').style}
+          >
             Prove the capability.
           </h1>
-          <p className="font-sans text-sm font-light leading-[1.8] text-text-muted max-w-[440px] mb-10">
+          <p
+            className={`font-sans text-sm font-light leading-[1.8] text-text-muted max-w-[440px] mb-10 ${fadeUp('400ms').className}`}
+            style={fadeUp('400ms').style}
+          >
             Upload a resume and job description. Get an ATS-optimized resume and recruiter-ready outreach copy — in under 2 minutes.
           </p>
-          <div className="flex gap-3 flex-wrap">
+          <div
+            className={`flex gap-3 flex-wrap ${fadeUp('520ms').className}`}
+            style={fadeUp('520ms').style}
+          >
             <Link 
               href="/app" 
               className="bg-accent-dark text-primary py-3.5 px-8 font-sans text-[11px] font-medium tracking-[0.12em] uppercase hover:opacity-90 transition-opacity text-center"
@@ -94,7 +128,7 @@ export default function LandingPage() {
               <div className="font-serif lining-nums text-[40px] font-light text-accent-dark leading-none mb-4">03</div>
               <h3 className="font-sans text-sm font-medium text-text-primary mb-2.5 mt-0">Time Cost</h3>
               <p className="font-sans text-[13px] font-light leading-[1.7] text-text-muted m-0">
-                20–40 hours of manual tailoring per application cycle. High effort, low leverage, wrong format.
+                Each application demands hours of manual keyword research, resume reformatting, and rewriting — with zero feedback on whether it worked.
               </p>
             </div>
           </div>
@@ -215,5 +249,6 @@ export default function LandingPage() {
         </span>
       </footer>
     </div>
+    </>
   );
 }

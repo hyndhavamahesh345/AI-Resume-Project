@@ -51,7 +51,7 @@ export default function LinkedInOptimization() {
       </nav>
 
       <main className="flex flex-col items-center p-12">
-        <h2 className="font-serif text-3xl mb-8">LinkedIn Profile Optimization</h2>
+        <h2 className="font-serif text-3xl mb-8 animate-fade-up">LinkedIn Profile Optimization</h2>
         <div className="w-full max-w-md space-y-6">
           <div>
             <label htmlFor="linkedinUrl" className="block text-sm font-medium text-text-secondary mb-1">

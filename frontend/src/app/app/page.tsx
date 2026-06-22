@@ -211,7 +211,7 @@ export default function Home() {
                 <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-4">
                   Pipeline Running
                 </p>
-                <h2 className="font-serif text-[48px] font-light text-text-primary mb-2 leading-none">
+                <h2 className="font-serif text-[48px] font-light text-text-primary mb-2 leading-none animate-fade-up">
                   Building your package
                 </h2>
                 <p className="font-sans text-[13px] font-light text-text-muted mb-12">
@@ -285,7 +285,7 @@ export default function Home() {
                 <p className="font-sans text-[9px] font-medium tracking-[0.25em] text-text-muted uppercase mb-3">
                   Pipeline
                 </p>
-                <h2 className="font-serif text-4xl font-light text-text-primary mb-10">
+                <h2 className="font-serif text-4xl font-light text-text-primary mb-10 animate-fade-up">
                   Start your application
                 </h2>
 
